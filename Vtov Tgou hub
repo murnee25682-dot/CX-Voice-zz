@@ -1,0 +1,180 @@
+-- ======================================================
+-- Vtov Tgou hub🔥 (Compact Edition)
+-- ======================================================
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- สร้างหน้าต่างขนาดกะทัดรัด (ลากย้ายได้)
+local Window = Rayfield:CreateWindow({
+    Name = "Vtov Tgou hub🔥",
+    LoadingTitle = "Vtov Tgou hub🔥",
+    LoadingSubtitle = "Compact Version",
+    Theme = "Default",
+    ToggleUIKeybind = "K",
+    Size = UDim2.new(0, 400, 0, 280), -- ปรับให้เล็กและสั้นลง
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "VtovTgouHub_Compact",
+        FileName = "Config"
+    },
+})
+
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+-- ======================================================
+-- 1. ฟังก์ชัน: ชนผู้เล่นกระเด็น (Fling)
+-- ======================================================
+local flingEnabled = false
+local flingConn = nil
+local function toggleFling(state)
+    flingEnabled = state
+    if flingConn then flingConn:Disconnect() flingConn = nil end
+    if not state then return end
+    flingConn = game:GetService("RunService").Heartbeat:Connect(function()
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.Velocity = Vector3.new(0, 100, 0) + player.Character.HumanoidRootPart.Velocity
+        end
+    end)
+end
+
+-- ======================================================
+-- 2. ฟังก์ชัน: AI ในตัว (Auto-Play เบื้องต้น)
+-- ======================================================
+local aiEnabled = false
+local aiConn = nil
+local function toggleAI(state)
+    aiEnabled = state
+    if aiConn then aiConn:Disconnect() aiConn = nil end
+    if not state then return end
+    aiConn = game:GetService("RunService").Heartbeat:Connect(function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChildOfClass("Humanoid") and math.random(1, 30) == 1 then
+            char:FindFirstChildOfClass("Humanoid").Jump = true
+        end
+    end)
+end
+
+-- ======================================================
+-- 3. ฟังก์ชัน: วาร์ปไปหาใครก็ได้ (ต้องพิมพ์ชื่อ)
+-- ======================================================
+local function teleportToPlayer(targetName)
+    local player = game.Players.LocalPlayer
+    local target = game.Players:FindFirstChild(targetName)
+    if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then
+        Rayfield:Notify({Title = "ไม่พบผู้เล่น", Content = "ไม่พบชื่อ: " .. targetName, Duration = 3})
+        return
+    end
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+        Rayfield:Notify({Title = "วาร์ปสำเร็จ", Content = "ไปหา " .. targetName .. " แล้ว", Duration = 3})
+    end
+end
+
+-- ======================================================
+-- 4. ฟังก์ชัน: ลดกราฟิก เพิ่ม FPS (Low Graphics)
+-- ======================================================
+local lowGFXEnabled = false
+local originalLighting = {}
+local function toggleLowGFX(state)
+    local lighting = game:GetService("Lighting")
+    lowGFXEnabled = state
+    if state then
+        originalLighting.Shadows = lighting.GlobalShadows
+        originalLighting.FogEnd = lighting.FogEnd
+        lighting.GlobalShadows = false
+        lighting.FogEnd = 100000
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then v.Enabled = false end
+        end
+    else
+        lighting.GlobalShadows = originalLighting.Shadows or true
+        lighting.FogEnd = originalLighting.FogEnd or 1000
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then v.Enabled = true end
+        end
+    end
+end
+
+-- ======================================================
+-- 5. ฟังก์ชัน: เดินทะลุทุกอย่าง (Noclip)
+-- ======================================================
+local noclipEnabled = false
+local noclipConn = nil
+local function toggleNoclip(state)
+    noclipEnabled = state
+    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
+    if not state then return end
+    noclipConn = game:GetService("RunService").Stepped:Connect(function()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
+        end
+    end)
+end
+
+-- ======================================================
+-- 6. ฟังก์ชัน: ล่องหน (Invisible)
+-- ======================================================
+local function toggleInvisible(state)
+    local char = game.Players.LocalPlayer.Character
+    if not char then return end
+    for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") or part:IsA("Decal") then
+            part.Transparency = state and 1 or 0
+        end
+    end
+    Rayfield:Notify({Title = "Invisible", Content = state and "เปิดล่องหน" or "ปิดล่องหน", Duration = 2})
+end
+
+-- ======================================================
+-- 7. ฟังก์ชัน: อมตะ (Godmode)
+-- ======================================================
+local godEnabled = false
+local godConn = nil
+local function toggleGod(state)
+    godEnabled = state
+    if godConn then godConn:Disconnect() godConn = nil end
+    if not state then return end
+    godConn = game:GetService("RunService").Heartbeat:Connect(function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChildOfClass("Humanoid") then
+            char:FindFirstChildOfClass("Humanoid").Health = char:FindFirstChildOfClass("Humanoid").MaxHealth
+        end
+    end)
+end
+
+-- ======================================================
+-- สร้าง UI ทั้งหมด (ปุ่ม Toggle เปิด/ปิด)
+-- ======================================================
+
+MainTab:CreateToggle({Name = "ชนผู้เล่นกระเด็น", CurrentValue = false, Flag = "Fling", Callback = toggleFling})
+MainTab:CreateToggle({Name = "AI ในตัว", CurrentValue = false, Flag = "AI", Callback = toggleAI})
+
+local tpInput = MainTab:CreateInput({
+    Name = "วาร์ปไปหา (พิมพ์ชื่อ)",
+    PlaceholderText = "ชื่อผู้เล่น...",
+    RemoveTextAfterFocusLost = false,
+    Flag = "TPInput",
+})
+
+MainTab:CreateButton({
+    Name = "วาร์ปไปหาผู้เล่น",
+    Callback = function()
+        if tpInput.Value and tpInput.Value ~= "" then
+            teleportToPlayer(tpInput.Value)
+        else
+            Rayfield:Notify({Title = "คำเตือน", Content = "กรุณาพิมพ์ชื่อก่อน", Duration = 2})
+        end
+    end,
+})
+
+MainTab:CreateToggle({Name = "ลดกราฟิก เพิ่ม FPS", CurrentValue = false, Flag = "LowGFX", Callback = toggleLowGFX})
+MainTab:CreateToggle({Name = "เดินทะลุทุกอย่าง (Noclip)", CurrentValue = false, Flag = "Noclip", Callback = toggleNoclip})
+MainTab:CreateToggle({Name = "ล่องหน (Invisible)", CurrentValue = false, Flag = "Invisible", Callback = toggleInvisible})
+MainTab:CreateToggle({Name = "อมตะ (Godmode)", CurrentValue = false, Flag = "Godmode", Callback = toggleGod})
+
+-- แจ้งเตือนเมื่อโหลดเสร็จ
+Rayfield:Notify({Title = "Vtov Tgou hub🔥", Content = "โหลดสำเร็จ! กด K เพื่อเปิด/ปิด UI", Duration = 5})
